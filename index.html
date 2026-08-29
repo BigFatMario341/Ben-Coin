@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beastcoin — Simple Crypto Wallet</title>
+  <script src="https://js.puter.com/v2/"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🦁</span>
+        <span class="logo-text">Beastcoin</span>
+      </div>
+      <div class="header-actions" id="header-actions">
+        <button id="sign-in-btn" class="btn btn-primary">Sign in with Puter</button>
+        <div id="user-info" class="user-info hidden">
+          <span id="username-display"></span>
+          <button id="sign-out-btn" class="btn btn-ghost">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Landing / Not signed in -->
+      <section id="landing" class="landing">
+        <div class="hero">
+          <h1>Welcome to Beastcoin</h1>
+          <p class="subtitle">The simplest crypto wallet. No complexity. Just coins.</p>
+          <p class="desc">Sign in with your Puter account to view your balance. Only the admin can add or remove coins.</p>
+          <button id="landing-sign-in" class="btn btn-primary btn-lg">Get Started</button>
+        </div>
+      </section>
+
+      <!-- Dashboard (signed in) -->
+      <section id="dashboard" class="dashboard hidden">
+        <div class="balance-card">
+          <div class="balance-label">Your Beastcoin Balance</div>
+          <div class="balance-amount" id="balance-display">0.00 <span class="coin-symbol">BEAST</span></div>
+          <div class="balance-note" id="admin-badge" class="hidden">Admin Mode Active</div>
+        </div>
+
+        <!-- User view: read only -->
+        <div id="user-panel" class="panel">
+          <h2>Your Wallet</h2>
+          <p class="muted">Only the admin can add or remove coins from any account. You cannot deposit or withdraw yourself.</p>
+          <div class="info-box">
+            <strong>How it works:</strong> Beastcoin is a controlled wallet. The admin issues coins. Your balance is managed exclusively by the admin.
+          </div>
+        </div>
+
+        <!-- Admin panel -->
+        <div id="admin-panel" class="panel admin-panel hidden">
+          <h2>Admin Controls</h2>
+          <p class="muted">You are the only one who can add or remove coins.</p>
+          
+          <div class="form-group">
+            <label for="target-username">Username (Puter username)</label>
+            <input type="text" id="target-username" placeholder="Enter Puter username" class="input">
+          </div>
+          
+          <div class="form-group">
+            <label for="amount">Amount (BEAST)</label>
+            <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" class="input">
+          </div>
+          
+          <div class="btn-row">
+            <button id="add-coins-btn" class="btn btn-success">Add Coins</button>
+            <button id="remove-coins-btn" class="btn btn-danger">Remove Coins</button>
+          </div>
+          
+          <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="new-coin-name">Add New Coin Type (optional)</label>
+            <div class="btn-row">
+              <input type="text" id="new-coin-name" placeholder="e.g. GOLD" class="input">
+              <button id="add-coin-type-btn" class="btn btn-secondary">Create Coin</button>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 2rem;">All Balances</h3>
+          <div id="balances-list" class="balances-list">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Beastcoin • Powered by Puter.js • Admin-controlled wallet</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

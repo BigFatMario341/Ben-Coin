@@ -56,10 +56,22 @@
           </div>
         </div>
 
+        <!-- Admin unlock (password required) -->
+        <div id="admin-unlock" class="panel hidden">
+          <h2>Admin Access</h2>
+          <p class="muted">Enter the admin password to unlock controls.</p>
+          <div class="form-group">
+            <label for="admin-password">Admin Password</label>
+            <input type="password" id="admin-password" placeholder="Enter password" class="input" autocomplete="off">
+          </div>
+          <button id="unlock-admin-btn" class="btn btn-primary">Unlock Admin</button>
+          <p id="admin-error" class="muted" style="color: #ef4444; margin-top: 0.75rem; display: none;">Incorrect password.</p>
+        </div>
+
         <!-- Admin panel -->
         <div id="admin-panel" class="panel admin-panel hidden">
           <h2>Admin Controls</h2>
-          <p class="muted">You are the only one who can add or remove coins.</p>
+          <p class="muted">You are the only one who can add or remove coins. <button id="lock-admin-btn" class="btn btn-ghost" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;">Lock</button></p>
           
           <div class="form-group">
             <label for="target-username">Username (Puter username)</label>

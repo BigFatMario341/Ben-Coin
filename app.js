@@ -2,13 +2,11 @@
  * Beastcoin Wallet
  * Simple admin-controlled crypto wallet using Puter.js for accounts.
  *
- * IMPORTANT: Set ADMIN_USERNAME to your Puter username.
- * Only that account can add/remove coins.
+ * Admin access requires the password (default: 1324).
  */
 
 // ============ CONFIG ============
-// Change this to YOUR Puter username to become the admin
-const ADMIN_USERNAME = "admin"; // <-- REPLACE with your Puter username
+const ADMIN_PASSWORD = "1324";
 
 // Storage key for balances (localStorage for shared demo state)
 const STORAGE_KEY = "beastcoin_balances_v1";
@@ -37,7 +35,12 @@ const els = {
   balanceDisplay: $("balance-display"),
   adminBadge: $("admin-badge"),
   userPanel: $("user-panel"),
+  adminUnlock: $("admin-unlock"),
   adminPanel: $("admin-panel"),
+  adminPassword: $("admin-password"),
+  unlockAdminBtn: $("unlock-admin-btn"),
+  lockAdminBtn: $("lock-admin-btn"),
+  adminError: $("admin-error"),
   targetUsername: $("target-username"),
   amount: $("amount"),
   addCoinsBtn: $("add-coins-btn"),
@@ -91,6 +94,7 @@ function showLanding() {
   els.dashboard.classList.add("hidden");
   els.userInfo.classList.add("hidden");
   els.signInBtn.classList.remove("hidden");
+  isAdmin = false;
 }
 
 function showDashboard() {
@@ -99,18 +103,25 @@ function showDashboard() {
   els.userInfo.classList.remove("hidden");
   els.signInBtn.classList.add("hidden");
   els.usernameDisplay.textContent = currentUser.username || currentUser.uuid || "User";
-  
+
   updateBalanceDisplay();
-  
+  updateAdminUI();
+}
+
+function updateAdminUI() {
   if (isAdmin) {
     els.adminBadge.classList.remove("hidden");
     els.adminPanel.classList.remove("hidden");
+    els.adminUnlock.classList.add("hidden");
     els.userPanel.classList.add("hidden");
     renderBalancesList();
   } else {
     els.adminBadge.classList.add("hidden");
     els.adminPanel.classList.add("hidden");
+    els.adminUnlock.classList.remove("hidden");
     els.userPanel.classList.remove("hidden");
+    if (els.adminPassword) els.adminPassword.value = "";
+    if (els.adminError) els.adminError.style.display = "none";
   }
 }
 
@@ -142,15 +153,13 @@ function escapeHtml(str) {
     .replace(/"/g, """);
 }
 
-function toast(msg, type = "info") {
-  // Simple alert for now; could be improved with a toast UI
+function toast(msg) {
   alert(msg);
 }
 
 // ============ AUTH (Puter.js) ============
 async function signIn() {
   try {
-    // puter.auth.signIn() opens a popup; must be from user gesture
     await puter.auth.signIn();
     await refreshAuth();
   } catch (err) {
@@ -181,15 +190,33 @@ async function refreshAuth() {
   try {
     const user = await puter.auth.getUser();
     currentUser = user;
-    // Admin check: match username (case-insensitive)
-    isAdmin =
-      (user.username && user.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) ||
-      (user.uuid && user.uuid === ADMIN_USERNAME); // fallback if you put uuid
+    isAdmin = false; // always start locked; require password
     showDashboard();
   } catch (err) {
     console.error("Failed to get user:", err);
     showLanding();
   }
+}
+
+// ============ ADMIN PASSWORD ============
+function unlockAdmin() {
+  const entered = (els.adminPassword.value || "").trim();
+  if (entered === ADMIN_PASSWORD) {
+    isAdmin = true;
+    updateAdminUI();
+    toast("Admin unlocked.");
+  } else {
+    if (els.adminError) {
+      els.adminError.style.display = "block";
+    }
+    els.adminPassword.value = "";
+    els.adminPassword.focus();
+  }
+}
+
+function lockAdmin() {
+  isAdmin = false;
+  updateAdminUI();
 }
 
 // ============ ADMIN ACTIONS ============
@@ -259,15 +286,23 @@ function bindEvents() {
   els.signInBtn.addEventListener("click", signIn);
   els.landingSignIn.addEventListener("click", signIn);
   els.signOutBtn.addEventListener("click", signOut);
+  els.unlockAdminBtn.addEventListener("click", unlockAdmin);
+  els.lockAdminBtn.addEventListener("click", lockAdmin);
   els.addCoinsBtn.addEventListener("click", handleAddCoins);
   els.removeCoinsBtn.addEventListener("click", handleRemoveCoins);
   els.addCoinTypeBtn.addEventListener("click", handleAddCoinType);
+
+  // Allow Enter key on password field
+  if (els.adminPassword) {
+    els.adminPassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") unlockAdmin();
+    });
+  }
 }
 
 async function init() {
   loadData();
   bindEvents();
-  // Check if already signed in
   if (typeof puter !== "undefined") {
     await refreshAuth();
   } else {
@@ -276,5 +311,4 @@ async function init() {
   }
 }
 
-// Start
 document.addEventListener("DOMContentLoaded", init);
